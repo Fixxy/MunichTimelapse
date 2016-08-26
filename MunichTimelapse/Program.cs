@@ -4,15 +4,98 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MunichTimelapse
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.Upload;
+using Google.Apis.Util.Store;
+using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
+
+namespace Google.Apis.YouTube.Samples
 {
-    class Program
+    internal class UploadVideo
     {
+        [STAThread]
         static void Main(string[] args)
+        {
+            Console.WriteLine("Main Timelapse creation routine (running until 00:00)");
+            Console.WriteLine("==============================");
+            tlCreate();
+
+            Console.WriteLine("YouTube Data API: Upload Video (copypasted)");
+            Console.WriteLine("==============================");
+            try
+            {
+                new UploadVideo().Run().Wait();
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var e in ex.InnerExceptions)
+                {
+                    Console.WriteLine("Error: " + e.Message);
+                }
+            }
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadLine();
+        }
+
+        private async Task Run()
+        {
+            UserCredential credential;
+            using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))
+            {
+                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    // This OAuth 2.0 access scope allows an application to upload files to the
+                    // authenticated user's YouTube channel, but doesn't allow other types of access.
+                    new[] { YouTubeService.Scope.YoutubeUpload },
+                    "user",
+                    CancellationToken.None
+                );
+            }
+
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = Assembly.GetExecutingAssembly().GetName().Name
+            });
+
+            var video = new Video();
+            video.Snippet = new VideoSnippet();
+            video.Snippet.Title = "Marienplatz (Munich) Timelapse " + DateTime.Now.Date.AddDays(-1).ToString("dd.MM.yyyy"); ;
+            video.Snippet.Description = @"Webcam used: http://stories.ludwigbeck.de/webcam";
+            video.Snippet.Tags = new string[] { "Marienplatz", "Timelapse", "Munich", "Munchen", "Webcam", DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") };
+            video.Snippet.CategoryId = "22"; // See https://developers.google.com/youtube/v3/docs/videoCategories/list
+            video.Status = new VideoStatus();
+            video.Status.PrivacyStatus = "unlisted"; // or "private" or "public"
+            var filePath = DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") + @"\" + DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") + ".mp4";
+
+            using (var fileStream = new FileStream(filePath, FileMode.Open))
+            {
+                var videosInsertRequest = youtubeService.Videos.Insert(video, "snippet,status", fileStream, "video/*");
+                videosInsertRequest.ProgressChanged += uploadProgressChanged;
+                videosInsertRequest.ResponseReceived += uploadResponseReceived;
+
+                await videosInsertRequest.UploadAsync();
+            }
+        }
+
+        void uploadProgressChanged(IUploadProgress progress)
+        {
+            Console.WriteLine(progress.Status + " " + progress.BytesSent);
+        }
+        void uploadResponseReceived(Video video)
+        {
+            Console.WriteLine("Video id '{0}' was successfully uploaded.", video.Id);
+        }
+
+        static void tlCreate()
         {
             //init 
             int today = DateTime.Now.Day;
@@ -39,7 +122,7 @@ namespace MunichTimelapse
                 count = Convert.ToInt32(lastFileName) + 1;
             }
 
-            while (DateTime.Now.Day == today)
+/*            while (DateTime.Now.Day == today)
             {
                 //save image
                 Console.WriteLine("[{0}] Saving image {1}", DateTime.Now.ToString(), "img" + count.ToString("D6") + ".jpg");
@@ -51,9 +134,8 @@ namespace MunichTimelapse
                 count++;
             }
             Console.WriteLine("[{0}] Day is over", DateTime.Now.ToString());
-
+*/
             convert(newFolder);
-            uploadYT();
         }
 
         static void convert(string newFolder)
@@ -76,7 +158,7 @@ namespace MunichTimelapse
             p.Start();
             p.WaitForExit();
 
-            //cleanup
+/*            //cleanup
             Console.WriteLine("[{0}] Cleanup", DateTime.Now.ToString());
             File.Delete(newFolder + "ffmpeg.exe");
             var jpgCleanup = Directory.GetFiles(newFolder, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase));
@@ -84,11 +166,6 @@ namespace MunichTimelapse
             {
                 File.Delete(jpgCleanup.ElementAt(i));
             }
-        }
-
-        static void uploadYT()
-        {
-            //TODO: autoupload to YouTube
-        }
+*/        }
     }
 }
