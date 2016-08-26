@@ -16,7 +16,7 @@ using Google.Apis.Util.Store;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 
-namespace Google.Apis.YouTube.Samples
+namespace MunichTimelapse
 {
     internal class UploadVideo
     {
