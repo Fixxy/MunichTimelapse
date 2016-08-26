@@ -14,7 +14,7 @@ namespace MunichTimelapse
     {
         static void Main(string[] args)
         {
-            //init
+            //init 
             int today = DateTime.Now.Day;
             int count = 0;
 
