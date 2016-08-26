@@ -32,7 +32,7 @@ namespace MunichTimelapse
 
                 //retrieving last file's name
                 string lastFilePath = jpgFiles.ElementAt((jpgFiles.Count()) - 1);
-                string folderNameTrim = lastFilePath.Substring(lastFilePath.Length - 10); // folder path trim
+                string folderNameTrim = lastFilePath.Substring(lastFilePath.Length - 10); //folder path trim
                 string lastFileName = folderNameTrim.Remove(folderNameTrim.Length - 4); //extension trim
 
                 Console.WriteLine("[{0}] Last number is {1}", DateTime.Now.ToString(), Convert.ToInt32(lastFileName));
@@ -53,6 +53,7 @@ namespace MunichTimelapse
             Console.WriteLine("[{0}] Day is over", DateTime.Now.ToString());
 
             convert(newFolder);
+            uploadYT();
         }
 
         static void convert(string newFolder)
@@ -83,6 +84,11 @@ namespace MunichTimelapse
             {
                 File.Delete(jpgCleanup.ElementAt(i));
             }
+        }
+
+        static void uploadYT()
+        {
+            //TODO: autoupload to YouTube
         }
     }
 }
