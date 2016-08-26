@@ -122,7 +122,7 @@ namespace MunichTimelapse
                 count = Convert.ToInt32(lastFileName) + 1;
             }
 
-/*            while (DateTime.Now.Day == today)
+            while (DateTime.Now.Day == today)
             {
                 //save image
                 Console.WriteLine("[{0}] Saving image {1}", DateTime.Now.ToString(), "img" + count.ToString("D6") + ".jpg");
@@ -134,7 +134,7 @@ namespace MunichTimelapse
                 count++;
             }
             Console.WriteLine("[{0}] Day is over", DateTime.Now.ToString());
-*/
+
             convert(newFolder);
         }
 
@@ -158,7 +158,7 @@ namespace MunichTimelapse
             p.Start();
             p.WaitForExit();
 
-/*            //cleanup
+            //cleanup
             Console.WriteLine("[{0}] Cleanup", DateTime.Now.ToString());
             File.Delete(newFolder + "ffmpeg.exe");
             var jpgCleanup = Directory.GetFiles(newFolder, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase));
@@ -166,6 +166,6 @@ namespace MunichTimelapse
             {
                 File.Delete(jpgCleanup.ElementAt(i));
             }
-*/        }
+        }
     }
 }
