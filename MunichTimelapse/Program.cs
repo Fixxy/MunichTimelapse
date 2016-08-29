@@ -71,9 +71,9 @@ namespace MunichTimelapse
             video.Snippet.Title = "Marienplatz (Munich) Timelapse " + DateTime.Now.Date.AddDays(-1).ToString("dd.MM.yyyy"); ;
             video.Snippet.Description = @"Webcam used: http://stories.ludwigbeck.de/webcam";
             video.Snippet.Tags = new string[] { "Marienplatz", "Timelapse", "Munich", "Munchen", "Webcam", DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") };
-            video.Snippet.CategoryId = "22"; // See https://developers.google.com/youtube/v3/docs/videoCategories/list
+            video.Snippet.CategoryId = "24"; // See https://developers.google.com/youtube/v3/docs/videoCategories/list
             video.Status = new VideoStatus();
-            video.Status.PrivacyStatus = "unlisted"; // or "private" or "public"
+            video.Status.PrivacyStatus = "public"; // or "private" or "public"
             var filePath = DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") + @"\" + DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") + ".mp4";
 
             using (var fileStream = new FileStream(filePath, FileMode.Open))
