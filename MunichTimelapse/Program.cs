@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -128,7 +129,11 @@ namespace MunichTimelapse
                 Console.WriteLine("[{0}] Saving image {1}", DateTime.Now.ToString(), "img" + count.ToString("D6") + ".jpg");
                 using (WebClient client = new WebClient())
                 {
-                    client.DownloadFile("http://kaufhaus.ludwigbeck.de/manual/webcam/1sec.jpg", newFolder + @"\img" + count.ToString("D6") + ".jpg");
+                    try
+                    {
+                        client.DownloadFile("http://kaufhaus.ludwigbeck.de/manual/webcam/1sec.jpg", newFolder + @"\img" + count.ToString("D6") + ".jpg");
+                    }
+                    catch(WebException ex) { Console.WriteLine("[{0}] Network error. Retrying...", DateTime.Now.ToString());}
                 }
                 Thread.Sleep(5000);
                 count++;
