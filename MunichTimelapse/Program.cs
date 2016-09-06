@@ -42,8 +42,7 @@ namespace MunichTimelapse
                 }
             }
 
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadLine();
+            Console.WriteLine("Done");
         }
 
         private async Task Run()
