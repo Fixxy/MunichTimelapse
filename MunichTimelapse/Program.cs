@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -60,6 +61,10 @@ namespace MunichTimelapse
                 );
             }
 
+            string ytTitle = ConfigurationManager.AppSettings["ytTitle"];
+            string ytDescription = ConfigurationManager.AppSettings["ytDescription"];
+            string[] ytTags = ConfigurationManager.AppSettings["ytTags"].ToString().Split(',');
+
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
@@ -68,9 +73,9 @@ namespace MunichTimelapse
 
             var video = new Video();
             video.Snippet = new VideoSnippet();
-            video.Snippet.Title = "Marienplatz (Munich) Timelapse " + DateTime.Now.Date.AddDays(-1).ToString("dd.MM.yyyy"); ;
-            video.Snippet.Description = @"Webcam used: http://stories.ludwigbeck.de/webcam \r\nSource code: https://github.com/Fixxy/MunichTimelapse";
-            video.Snippet.Tags = new string[] { "Marienplatz", "Timelapse", "Munich", "Munchen", "Webcam", DateTime.Now.Date.AddDays(-1).ToString("yyyyMMdd") };
+            video.Snippet.Title = ytTitle + DateTime.Now.Date.AddDays(-1).ToString("dd.MM.yyyy"); ;
+            video.Snippet.Description = ytDescription;
+            video.Snippet.Tags = ytTags;
             video.Snippet.CategoryId = "24"; // See https://developers.google.com/youtube/v3/docs/videoCategories/list
             video.Status = new VideoStatus();
             video.Status.PrivacyStatus = "public"; // or "private" or "public"
@@ -132,7 +137,7 @@ namespace MunichTimelapse
                     {
                         client.DownloadFile("http://kaufhaus.ludwigbeck.de/manual/webcam/1sec.jpg", newFolder + @"\img" + count.ToString("D6") + ".jpg");
                     }
-                    catch(WebException ex) { Console.WriteLine("[{0}] Network error. Retrying...", DateTime.Now.ToString());}
+                    catch(WebException ex) { Console.WriteLine("[{0}] Network error. Retrying...", DateTime.Now.ToString()); count--; }
                 }
                 Thread.Sleep(5000);
                 count++;
